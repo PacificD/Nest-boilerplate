@@ -1,23 +1,28 @@
 /*
  * @Author: Pacific_D
  * @Date: 2022-08-30 21:06:25
- * @LastEditTime: 2022-08-30 22:02:52
+ * @LastEditTime: 2022-11-03 18:15:20
  * @LastEditors: Pacific_D
  * @Description:
- * @FilePath: \todo\src\todo\todo.module.ts
+ * @FilePath: \nest-boilerplate\src\todo\todo.module.ts
  */
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { Module } from "@nestjs/common"
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
 import TodoService from "./todo.service"
 import { TodoController } from "./todo.controller"
 import Todo from "./entities/todo.entity"
 import { JwtService } from "@nestjs/jwt"
+import AccessUserInfoMiddleware from "../middlewares/AccessUserInfoMiddleware/AccessUserInfoMiddleware"
 
 @Module({
   imports: [TypeOrmModule.forFeature([Todo])],
   controllers: [TodoController],
   providers: [TodoService, JwtService]
 })
-class TodoModule {}
+class TodoModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AccessUserInfoMiddleware).forRoutes("*")
+  }
+}
 
 export default TodoModule
