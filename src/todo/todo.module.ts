@@ -12,7 +12,7 @@ import TodoService from "./todo.service"
 import { TodoController } from "./todo.controller"
 import Todo from "./entities/todo.entity"
 import { JwtService } from "@nestjs/jwt"
-import AccessUserInfoMiddleware from "../middlewares/AccessUserInfoMiddleware/AccessUserInfoMiddleware"
+import AccessUserInfoMiddleware from "../middlewares/AccessUserInfoMiddleware/AccessUserInfo.middleware"
 
 @Module({
   imports: [TypeOrmModule.forFeature([Todo])],

@@ -8,7 +8,7 @@
  */
 import { Module } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
-import AccessUserInfoMiddleware from "./AccessUserInfoMiddleware"
+import AccessUserInfoMiddleware from "./AccessUserInfo.middleware"
 
 @Module({
   providers: [AccessUserInfoMiddleware, JwtService],

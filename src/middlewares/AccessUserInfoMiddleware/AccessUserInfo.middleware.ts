@@ -1,10 +1,10 @@
 /*
  * @Author: Pacific_D
  * @Date: 2022-11-02 23:12:28
- * @LastEditTime: 2022-11-03 18:57:10
+ * @LastEditTime: 2022-11-03 19:05:35
  * @LastEditors: Pacific_D
  * @Description:
- * @FilePath: \nest-boilerplate\src\middlewares\AccessUserInfoMiddleware\AccessUserInfoMiddleware.ts
+ * @FilePath: \nest-boilerplate\src\middlewares\AccessUserInfoMiddleware\AccessUserInfo.middleware.ts
  */
 4
 import {
