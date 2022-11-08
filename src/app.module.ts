@@ -1,20 +1,45 @@
 /*
  * @Author: Pacific_D
  * @Date: 2022-08-30 17:32:15
- * @LastEditTime: 2022-08-30 21:18:37
+ * @LastEditTime: 2022-11-08 20:32:31
  * @LastEditors: Pacific_D
  * @Description:
- * @FilePath: \todo\src\app.module.ts
+ * @FilePath: \nest-boilerplate\src\app.module.ts
  */
-import { Module } from "@nestjs/common"
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
+import { ConfigModule, ConfigService } from "@nestjs/config"
 import { TypeOrmModule } from "@nestjs/typeorm"
+import configurationFactory from "./config/configuration.factory"
 import UserModule from "./user/user.module"
-import ormConfig from "./config/ormConfig"
 import TodoModule from "./todo/todo.module"
+import AppLoggerMiddleware from "./middlewares/AppLogger.middleware"
 
 @Module({
-  imports: [TypeOrmModule.forRoot(ormConfig), UserModule, TodoModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: configurationFactory
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const databaseConfig = configService.get("database")
+        return {
+          ...databaseConfig,
+          synchronize: true,
+          autoLoadEntities: true
+        }
+      }
+    }),
+
+    UserModule,
+    TodoModule
+  ],
   controllers: [],
   providers: []
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AppLoggerMiddleware).forRoutes("*")
+  }
+}

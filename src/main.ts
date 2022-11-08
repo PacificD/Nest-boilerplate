@@ -1,21 +1,22 @@
 /*
  * @Author: Pacific_D
  * @Date: 2022-08-30 17:22:57
- * @LastEditTime: 2022-08-30 21:34:03
+ * @LastEditTime: 2022-11-08 18:34:31
  * @LastEditors: Pacific_D
  * @Description:
- * @FilePath: \todo\src\main.ts
+ * @FilePath: \nest-boilerplate\src\main.ts
  */
 import { ValidationPipe } from "@nestjs/common"
 import { NestFactory } from "@nestjs/core"
+import { ConfigService } from "@nestjs/config"
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger"
 import { AppModule } from "./app.module"
 import HttpExceptionFilter from "./filters/HttpException"
-
-const port = 4096
-
 ;(async () => {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    logger: ["debug", "error", "log", "verbose", "warn"]
+  })
+  const configService = app.get(ConfigService)
 
   //配置全局管道
   app.useGlobalPipes(
@@ -35,15 +36,18 @@ const port = 4096
   app.useGlobalFilters(new HttpExceptionFilter())
 
   //配置swagger
-  const options = new DocumentBuilder()
-    .setTitle("todo-backend")
-    .setDescription("Todo API")
-    .setVersion("1.0")
-    .addTag("User")
-    .addTag("todo")
-    .build()
-  const document = SwaggerModule.createDocument(app, options)
-  SwaggerModule.setup("swagger", app, document)
+  configService.get("enableSwagger") &&
+    (() => {
+      const options = new DocumentBuilder()
+        .setTitle("todo-backend")
+        .setDescription("Todo API")
+        .setVersion("1.0")
+        .addTag("User")
+        .addTag("todo")
+        .build()
+      const document = SwaggerModule.createDocument(app, options)
+      SwaggerModule.setup("swagger", app, document)
+    })()
 
-  await app.listen(port)
+  await app.listen(configService.get("port"))
 })()
