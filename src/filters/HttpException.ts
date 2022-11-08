@@ -1,10 +1,10 @@
 /*
  * @Author: Pacific_D
  * @Date: 2022-08-30 21:32:50
- * @LastEditTime: 2022-08-30 21:32:52
+ * @LastEditTime: 2022-11-03 20:23:13
  * @LastEditors: Pacific_D
  * @Description:
- * @FilePath: \todo\src\filters\HttpException.ts
+ * @FilePath: \nest-boilerplate\src\filters\HttpException.ts
  */
 import {
   ArgumentsHost,
@@ -14,14 +14,15 @@ import {
   HttpStatus,
   Logger
 } from "@nestjs/common"
+import { Request, Response } from "express"
 
 @Catch(HttpException)
 class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp(),
-      response = ctx.getResponse(),
-      request = ctx.getRequest(),
-      path = request.route ? request.route.path : "非法路径"
+      response = ctx.getResponse<Response>(),
+      request = ctx.getRequest<Request>(),
+      path = request.originalUrl
 
     const status =
       exception instanceof HttpException
@@ -38,8 +39,11 @@ class HttpExceptionFilter implements ExceptionFilter {
       } else {
         error = "请求失败"
       }
+    } else {
+      error = exceptionResponse
+      message = exceptionResponse
     }
-    Logger.error("'" + path + "': " + message)
+    Logger.error(`'${path}': ${error}, MESSAGE: ${message}`)
 
     const errorResponse = {
       statusCode: status,
