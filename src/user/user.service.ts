@@ -2,11 +2,11 @@
  * @Author: PacificD
  * @Date: 2021-10-07 22:36:14
  * @LastEditors: Pacific_D
- * @LastEditTime: 2022-08-30 21:48:31
+ * @LastEditTime: 2022-11-03 21:09:07
  * @Description:
  */
-import { Injectable } from "@nestjs/common"
-import { statusCodeEnum, Result } from "../config/resultType"
+import { Injectable, HttpException, HttpStatus } from "@nestjs/common"
+import { Result } from "../config/resultType"
 import { JwtService } from "@nestjs/jwt"
 import UserDto from "./dto/user.dto"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -43,13 +43,11 @@ class UserService {
         username: userLoginDto.username,
         token: this.signToken(checkResult[0].id, userLoginDto.username)
       })
-    } else {
-      //username or password error
-      return Result.fail(
-        statusCodeEnum.BAD_REQUEST,
-        "Fail! Username or password error!"
+    } else
+      throw new HttpException(
+        "Fail! Username or password error!",
+        HttpStatus.BAD_REQUEST
       )
-    }
   }
 
   async register(userRegisterDto: UserDto): Promise<Result> {
@@ -59,12 +57,11 @@ class UserService {
       }
     })
 
-    if (checkResult.length) {
-      return Result.fail(
-        statusCodeEnum.BAD_REQUEST,
-        "Fail! Username already exists!"
+    if (checkResult.length)
+      throw new HttpException(
+        "Fail! Username already exists!",
+        HttpStatus.BAD_REQUEST
       )
-    }
 
     const newUser = new User(userRegisterDto.username, userRegisterDto.password)
     this.userRepository.insert(newUser)

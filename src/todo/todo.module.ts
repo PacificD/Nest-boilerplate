@@ -1,7 +1,7 @@
 /*
  * @Author: Pacific_D
  * @Date: 2022-08-30 21:06:25
- * @LastEditTime: 2022-11-03 18:15:20
+ * @LastEditTime: 2022-11-03 19:25:28
  * @LastEditors: Pacific_D
  * @Description:
  * @FilePath: \nest-boilerplate\src\todo\todo.module.ts
@@ -21,7 +21,7 @@ import AccessUserInfoMiddleware from "../middlewares/AccessUserInfoMiddleware/Ac
 })
 class TodoModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AccessUserInfoMiddleware).forRoutes("*")
+    consumer.apply(AccessUserInfoMiddleware).forRoutes(TodoController)
   }
 }
 

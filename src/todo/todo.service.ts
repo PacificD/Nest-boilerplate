@@ -1,12 +1,12 @@
 /*
  * @Author: Pacific_D
  * @Date: 2022-08-30 21:16:13
- * @LastEditTime: 2022-08-30 23:01:43
+ * @LastEditTime: 2022-11-03 21:11:48
  * @LastEditors: Pacific_D
  * @Description:
- * @FilePath: \todo\src\todo\todo.service.ts
+ * @FilePath: \nest-boilerplate\src\todo\todo.service.ts
  */
-import { Injectable } from "@nestjs/common"
+import { Injectable, HttpException, HttpStatus } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import Todo from "./entities/todo.entity"
@@ -34,7 +34,7 @@ class TodoService {
         user: newTodo.user
       })
     }
-    return Result.fail(statusCodeEnum.INTERNAL_SERVER_ERROR, "Fail!")
+    throw new HttpException("Fail!", HttpStatus.INTERNAL_SERVER_ERROR)
   }
 
   async remove(id: string, userID: string): Promise<Result> {
@@ -46,10 +46,10 @@ class TodoService {
         user: userID
       }
     })
-    if (checkUser.length === 0) {
-      // mismatch user
-      return Result.fail(statusCodeEnum.BAD_REQUEST, "Fail! Invaild operate!")
-    }
+    // mismatch user
+    if (checkUser.length === 0)
+      throw new HttpException("Fail! Invaild operate!", HttpStatus.BAD_REQUEST)
+
     await this.todoRepository.softDelete(id).then(res => {
       result = res.affected
         ? Result.success("successfully remove!")
@@ -81,22 +81,21 @@ class TodoService {
   async update(updateTodoDto: UpdateTodoDto, userID: string): Promise<Result> {
     let result: Result
     const state = updateTodoDto.state
-    if (!["0", "1"].includes(state + "") || !state) {
-      return Result.fail(
-        statusCodeEnum.BAD_REQUEST,
-        "Fail! state must be 0 or 1!"
+    if (!["0", "1"].includes(state + "") || !state)
+      throw new HttpException(
+        "Fail! state must be 0 or 1!",
+        HttpStatus.BAD_REQUEST
       )
-    }
+
     const checkUser = await this.todoRepository.find({
       where: {
         id: updateTodoDto.id,
         user: userID
       }
     })
-    if (checkUser.length === 0) {
-      // mismatch user
-      return Result.fail(statusCodeEnum.BAD_REQUEST, "Fail! Invaild operate!")
-    }
+    // mismatch user
+    if (checkUser.length === 0)
+      throw new HttpException("Fail! Invaild operate!", HttpStatus.BAD_REQUEST)
 
     await this.todoRepository
       .update(
