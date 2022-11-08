@@ -1,15 +1,14 @@
 /*
  * @Author: Pacific_D
  * @Date: 2022-11-02 23:12:28
- * @LastEditTime: 2022-11-03 19:05:35
+ * @LastEditTime: 2022-11-03 20:20:05
  * @LastEditors: Pacific_D
  * @Description:
  * @FilePath: \nest-boilerplate\src\middlewares\AccessUserInfoMiddleware\AccessUserInfo.middleware.ts
  */
 4
 import {
-  HttpException,
-  HttpStatus,
+  UnauthorizedException,
   Injectable,
   NestMiddleware
 } from "@nestjs/common"
@@ -31,7 +30,7 @@ class AccessUserInfoMiddleware implements NestMiddleware {
     const authHeader = req.header("authorization")
 
     if (!authHeader) {
-      throw new HttpException("No auth token", HttpStatus.UNAUTHORIZED)
+      throw new UnauthorizedException()
     }
 
     const decodedJWT = this.jwtService.decode(authHeader) as IDecodedJWT
